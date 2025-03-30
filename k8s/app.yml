@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: sdjpa-jdbc-template
-          image: domboeckli/sdjpa-jdbc:0.0.1-SNAPSHOT
+          image: domboeckli/sdjpa-jdbc-template:0.0.1-SNAPSHOT
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: mysql
