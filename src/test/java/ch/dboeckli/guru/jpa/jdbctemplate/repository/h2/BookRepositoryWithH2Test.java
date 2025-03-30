@@ -25,8 +25,8 @@ class BookRepositoryWithH2Test {
 
         long countAfter = bookRepository.count();
 
-        assertEquals(0, countBefore);
-        assertEquals(1, countAfter);
+        assertEquals(5, countBefore);
+        assertEquals(6, countAfter);
     }
 
 }

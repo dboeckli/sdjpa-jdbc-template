@@ -17,6 +17,7 @@ spring:
   sql:
     init:
       schema-locations: classpath:h2-schema.sql
+      data-locations: classpath:h2-data.sql
       mode: always
 
   jpa:
