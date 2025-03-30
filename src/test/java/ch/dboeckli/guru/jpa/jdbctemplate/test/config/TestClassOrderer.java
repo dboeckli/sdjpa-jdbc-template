@@ -1,4 +1,4 @@
-package ch.dboeckli.guru.jpa.jdbc.test.config;
+package ch.dboeckli.guru.jpa.jdbctemplate.test.config;
 
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;

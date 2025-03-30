@@ -1,4 +1,4 @@
-package ch.dboeckli.guru.jpa.jdbc.core;
+package ch.dboeckli.guru.jpa.jdbctemplate.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

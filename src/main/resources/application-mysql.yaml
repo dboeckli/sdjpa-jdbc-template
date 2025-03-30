@@ -1,6 +1,6 @@
 spring:
   application:
-    name: sdjpa-jdbc
+    name: sdjpa-jdbc-template
 
   docker:
     compose:

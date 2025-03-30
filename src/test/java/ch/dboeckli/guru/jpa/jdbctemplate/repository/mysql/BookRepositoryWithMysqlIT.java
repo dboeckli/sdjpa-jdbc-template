@@ -1,7 +1,7 @@
-package ch.dboeckli.guru.jpa.jdbc.repository.mysql;
+package ch.dboeckli.guru.jpa.jdbctemplate.repository.mysql;
 
-import ch.dboeckli.guru.jpa.jdbc.domain.Book;
-import ch.dboeckli.guru.jpa.jdbc.repository.BookRepository;
+import ch.dboeckli.guru.jpa.jdbctemplate.domain.Book;
+import ch.dboeckli.guru.jpa.jdbctemplate.repository.BookRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

@@ -1,4 +1,4 @@
-package ch.dboeckli.guru.jpa.jdbc.domain;
+package ch.dboeckli.guru.jpa.jdbctemplate.domain;
 
 import org.junit.jupiter.api.Test;
 
