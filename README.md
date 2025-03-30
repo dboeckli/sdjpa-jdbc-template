@@ -1,25 +1,6 @@
-# Spring Data JPA - Introduction to Spring Data JDBC
+# Spring Data JPA - JDBC Template
 
 This repository contains source code examples to support my course Spring Data JPA and Hibernate Beginner to Guru
-
-This projects demonstrates the old way with the DAO (Data Access Object) pattern
-
-## Java DAO Pattern
-
-- DAO - Data Access Object
-- Pattern was a precursor to JPA, before ORMs become popular
-- Older and uses JDBC for data access
-- Common to see in legacy J2EE applications
-- While not common in use anymore, it is a good way to utilize JDBC
-- Very similar to the Repository Pattern used by Spring Data
-- DAO Pattern - Purpose is to isolate persistence operations from the application layer
-- For example, when the application needs to persist an object, it should not need to understand the underlying persistence technology
-- Domain Class - Simple POJOs, same as JPA entities
-- NOTE: DAO Pattern will not utilize JPA annotations
-- DAO API - Provide interface for CRUD operations (similar to Repository)
-- DAO Implementation - Implement persistence functionality
-
-![img.png](img.png)
 
 ## Flyway
 
