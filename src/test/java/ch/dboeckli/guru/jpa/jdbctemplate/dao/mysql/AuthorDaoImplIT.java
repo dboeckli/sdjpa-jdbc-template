@@ -3,21 +3,23 @@ package ch.dboeckli.guru.jpa.jdbctemplate.dao.mysql;
 import ch.dboeckli.guru.jpa.jdbctemplate.dao.AuthorDao;
 import ch.dboeckli.guru.jpa.jdbctemplate.dao.AuthorDaoImpl;
 import ch.dboeckli.guru.jpa.jdbctemplate.domain.Author;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test_mysql")
 @Import(AuthorDaoImpl.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Slf4j
 class AuthorDaoImplIT {
 
     @Autowired
@@ -33,7 +35,11 @@ class AuthorDaoImplIT {
 
         authorDao.deleteAuthorById(saved.getId());
 
-        assertThrows(EmptyResultDataAccessException.class, () -> authorDao.getById(saved.getId()));
+        TransientDataAccessResourceException ex = assertThrows(
+            TransientDataAccessResourceException.class, () -> authorDao.getById(saved.getId())
+        );
+        log.info("### Exception message: " + ex.getMessage());
+        assertThat(ex.getMessage()).contains("Illegal operation on empty result set");
     }
 
     @Test
@@ -69,8 +75,29 @@ class AuthorDaoImplIT {
     }
 
     @Test
-    void testGetAuthorByID() {
+    void testGetAuthorWithThreeBooks() {
         Author author = authorDao.getById(1L);
         assertThat(author.getId()).isNotNull();
+        assertEquals(3, author.getBooks().size());
+    }
+
+    @Test
+    void testGetAuthorWithOneBooks() {
+        Author author = authorDao.getById(2L);
+        assertThat(author.getId()).isNotNull();
+        assertEquals(1, author.getBooks().size());
+    }
+
+    @Test
+    void testGetAuthorWithoutBooks() {
+        Author author = new Author();
+        author.setFirstName("john");
+        author.setLastName("belushi");
+
+        Author saved = authorDao.saveNewAuthor(author);
+
+        Author authorWithoutBooks = authorDao.getById(saved.getId());
+        assertThat(authorWithoutBooks.getId()).isNotNull();
+        assertNull(authorWithoutBooks.getBooks());
     }
 }
