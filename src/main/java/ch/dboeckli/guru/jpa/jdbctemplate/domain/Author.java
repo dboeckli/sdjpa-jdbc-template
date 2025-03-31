@@ -1,12 +1,11 @@
 package ch.dboeckli.guru.jpa.jdbctemplate.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -20,6 +19,9 @@ public class Author {
 
     private String firstName;
     private String lastName;
+
+    @Transient
+    private List<Book> books;
 
     @Override
     public boolean equals(Object o) {
