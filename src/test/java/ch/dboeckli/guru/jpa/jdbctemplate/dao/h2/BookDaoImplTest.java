@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -121,5 +122,12 @@ class BookDaoImplTest {
     void testFindAllBookPage10WithPageable() {
         List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
         assertThat(books.size()).isEqualTo(0);
+    }
+
+    @Test
+    void testFindAllBookSorted() {
+        List<Book> books = bookDao.findAllBooksSortByTitle(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("title"))));
+        assertThat(books).isNotNull();
+        assertThat(books.size()).isEqualTo(10);
     }
 }
