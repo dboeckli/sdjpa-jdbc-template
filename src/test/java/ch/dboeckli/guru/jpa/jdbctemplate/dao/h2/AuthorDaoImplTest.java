@@ -73,17 +73,17 @@ class AuthorDaoImplTest {
     }
 
     @Test
-    void testGetAuthorWithThreeBooks() {
+    void testGetAuthorWithSixBooks() {
         Author author = authorDao.getById(1L);
         assertThat(author.getId()).isNotNull();
-        assertEquals(3, author.getBooks().size());
+        assertEquals(6, author.getBooks().size());
     }
 
     @Test
-    void testGetAuthorWithOneBooks() {
+    void testGetAuthorWithThreeBooks() {
         Author author = authorDao.getById(2L);
         assertThat(author.getId()).isNotNull();
-        assertEquals(1, author.getBooks().size());
+        assertEquals(3, author.getBooks().size());
     }
 
     @Test

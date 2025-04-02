@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class BookDaoImpl implements BookDao {
@@ -41,6 +43,16 @@ public class BookDaoImpl implements BookDao {
     @Override
     public void deleteBookById(Long id) {
         jdbcTemplate.update("DELETE from book where id = ?", id);
+    }
+
+    @Override
+    public List<Book> findAllBooks() {
+        return jdbcTemplate.query("SELECT * FROM book", getBookMapper());
+    }
+
+    @Override
+    public List<Book> findAllBooks(int pageSize, int offset) {
+        return jdbcTemplate.query("SELECT * FROM book limit ? offset ?", getBookMapper(), pageSize, offset);
     }
 
     private BookMapper getBookMapper(){

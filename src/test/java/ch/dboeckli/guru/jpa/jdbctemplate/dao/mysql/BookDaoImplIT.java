@@ -3,6 +3,7 @@ package ch.dboeckli.guru.jpa.jdbctemplate.dao.mysql;
 import ch.dboeckli.guru.jpa.jdbctemplate.dao.BookDao;
 import ch.dboeckli.guru.jpa.jdbctemplate.dao.BookDaoImpl;
 import ch.dboeckli.guru.jpa.jdbctemplate.domain.Book;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -78,5 +81,29 @@ class BookDaoImplIT {
         Book book = bookDao.getById(3L);
 
         assertThat(book.getId()).isNotNull();
+    }
+
+    @Test
+    void testFindAllBook() {
+        List<Book> books = bookDao.findAllBooks();
+        AssertionsForClassTypes.assertThat(books.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void testFindAllBookPage1() {
+        List<Book> books = bookDao.findAllBooks(10, 0);
+        assertThat(books.size()).isEqualTo(10);
+    }
+
+    @Test
+    void testFindAllBookPage2() {
+        List<Book> books = bookDao.findAllBooks(10, 10);
+        assertThat(books.size()).isEqualTo(10);
+    }
+
+    @Test
+    void testFindAllBookPage10() {
+        List<Book> books = bookDao.findAllBooks(10, 100);
+        assertThat(books.size()).isEqualTo(0);
     }
 }
