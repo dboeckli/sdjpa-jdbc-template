@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -101,6 +102,24 @@ class BookDaoImplTest {
     @Test
     void testFindAllBookPage10() {
         List<Book> books = bookDao.findAllBooks(10, 100);
+        assertThat(books.size()).isEqualTo(0);
+    }
+
+    @Test
+    void testFindAllBookPage1WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(0, 10));
+        assertThat(books.size()).isEqualTo(10);
+    }
+
+    @Test
+    void testFindAllBookPage2WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(1, 10));
+        assertThat(books.size()).isEqualTo(10);
+    }
+
+    @Test
+    void testFindAllBookPage10WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
         assertThat(books.size()).isEqualTo(0);
     }
 }
