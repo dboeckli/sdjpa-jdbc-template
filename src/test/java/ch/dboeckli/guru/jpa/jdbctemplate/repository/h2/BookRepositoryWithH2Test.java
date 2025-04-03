@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 // we are using the h2 in compatible mode with mysql. to assure that it is not replaced with h2
@@ -25,8 +26,10 @@ class BookRepositoryWithH2Test {
 
         long countAfter = bookRepository.count();
 
-        assertEquals(5, countBefore);
-        assertEquals(6, countAfter);
+        assertAll(
+            () -> assertThat(countBefore).isEqualTo(25),
+            () -> assertThat(countAfter).isEqualTo(26)
+        );
     }
 
 }

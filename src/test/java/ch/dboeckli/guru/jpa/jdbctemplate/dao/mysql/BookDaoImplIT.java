@@ -94,43 +94,43 @@ class BookDaoImplIT {
     @Test
     void testFindAllBookPage1() {
         List<Book> books = bookDao.findAllBooks(10, 0);
-        assertThat(books.size()).isEqualTo(10);
+        assertThat(books).hasSize(10);
     }
 
     @Test
     void testFindAllBookPage2() {
         List<Book> books = bookDao.findAllBooks(10, 10);
-        assertThat(books.size()).isEqualTo(10);
+        assertThat(books).hasSize(10);
     }
 
     @Test
     void testFindAllBookPage10() {
         List<Book> books = bookDao.findAllBooks(10, 100);
-        assertThat(books.size()).isEqualTo(0);
+        assertThat(books).isEmpty();
     }
 
     @Test
     void testFindAllBookPage1WithPageable() {
         List<Book> books = bookDao.findAllBooks(PageRequest.of(0, 10));
-        assertThat(books.size()).isEqualTo(10);
+        assertThat(books).hasSize(10);
     }
 
     @Test
     void testFindAllBookPage2WithPageable() {
         List<Book> books = bookDao.findAllBooks(PageRequest.of(1, 10));
-        assertThat(books.size()).isEqualTo(10);
+        assertThat(books).hasSize(10);
     }
 
     @Test
     void testFindAllBookPage10WithPageable() {
         List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
-        assertThat(books.size()).isEqualTo(0);
+        assertThat(books).isEmpty();
     }
 
     @Test
     void testFindAllBookSorted() {
         List<Book> books = bookDao.findAllBooksSortByTitle(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("title"))));
         assertThat(books).isNotNull();
-        assertThat(books.size()).isEqualTo(10);
+        assertThat(books).hasSize(10);
     }
 }

@@ -4,12 +4,17 @@ import ch.dboeckli.guru.jpa.jdbctemplate.dao.AuthorDao;
 import ch.dboeckli.guru.jpa.jdbctemplate.dao.AuthorDaoImpl;
 import ch.dboeckli.guru.jpa.jdbctemplate.domain.Author;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,15 +80,79 @@ class AuthorDaoImplTest {
     @Test
     void testGetAuthorWithSixBooks() {
         Author author = authorDao.getById(1L);
-        assertThat(author.getId()).isNotNull();
-        assertEquals(6, author.getBooks().size());
+
+        assertAll(
+            () -> assertThat(author.getId()).isNotNull(),
+            () -> assertThat(author.getBooks()).hasSize(6)
+        );
     }
 
     @Test
     void testGetAuthorWithThreeBooks() {
         Author author = authorDao.getById(2L);
-        assertThat(author.getId()).isNotNull();
-        assertEquals(3, author.getBooks().size());
+
+        assertAll(
+            () -> assertThat(author.getId()).isNotNull(),
+            () -> assertThat(author.getBooks()).hasSize(3)
+        );
+    }
+
+    @Test
+    void testFindAllAuthors() {
+        List<Author> authors = authorDao.findAllAuthors();
+
+        log.info("### Found Authors count: {}, with: {}", authors.size(), authors);
+        AssertionsForClassTypes.assertThat(authors.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void findAllAuthorsByLastName() {
+        List<Author> authors = authorDao.findAllAuthorsByLastName("Smith", PageRequest.of(0, 10));
+
+        assertAll(
+            () -> assertThat(authors).isNotNull(),
+            () -> assertThat(authors).hasSize(10)
+        );
+    }
+
+    @Test
+    void findAllAuthorsByLastNameSortLastNameDesc() {
+        List<Author> authors = authorDao.findAllAuthorsByLastName("Smith",
+            PageRequest.of(0, 10, Sort.by(Sort.Order.desc("firstname"))));
+
+        assertAll(
+            () -> assertThat(authors).isNotNull(),
+            () -> assertThat(authors).hasSize(10),
+            () -> {
+                assert authors != null;
+                assertThat(authors.getFirst().getFirstName()).isEqualTo("Yugal");
+            }
+        );
+    }
+
+    @Test
+    void findAllAuthorsByLastNameSortLastNameAsc() {
+        List<Author> authors = authorDao.findAllAuthorsByLastName("Smith",
+            PageRequest.of(0, 10, Sort.by(Sort.Order.asc("firstname"))));
+
+        assertAll(
+            () -> assertThat(authors).isNotNull(),
+            () -> assertThat(authors).hasSize(10),
+            () -> {
+                assert authors != null;
+                assertThat(authors.getFirst().getFirstName()).isEqualTo("Ahmed");
+            }
+        );
+    }
+
+    @Test
+    void findAllAuthorsByLastNameAllRecs() {
+        List<Author> authors = authorDao.findAllAuthorsByLastName("Smith", PageRequest.of(0, 100));
+
+        assertAll(
+            () -> assertThat(authors).isNotNull(),
+            () -> assertThat(authors).hasSize(40)
+        );
     }
 
     @Test
@@ -95,7 +164,10 @@ class AuthorDaoImplTest {
         Author saved = authorDao.saveNewAuthor(author);
 
         Author authorWithoutBooks = authorDao.getById(saved.getId());
-        assertThat(authorWithoutBooks.getId()).isNotNull();
-        assertNull(authorWithoutBooks.getBooks());
+
+        assertAll(
+            () -> assertThat(authorWithoutBooks.getId()).isNotNull(),
+            () -> assertNull(authorWithoutBooks.getBooks())
+        );
     }
 }
