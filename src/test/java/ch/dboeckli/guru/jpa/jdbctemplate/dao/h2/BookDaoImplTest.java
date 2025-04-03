@@ -9,6 +9,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -76,5 +80,54 @@ class BookDaoImplTest {
         Book book = bookDao.getById(3L);
 
         assertThat(book.getId()).isNotNull();
+    }
+
+    @Test
+    void testFindAllBook() {
+        List<Book> books = bookDao.findAllBooks();
+        assertThat(books.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void testFindAllBookPage1() {
+        List<Book> books = bookDao.findAllBooks(10, 0);
+        assertThat(books).hasSize(10);
+    }
+
+    @Test
+    void testFindAllBookPage2() {
+        List<Book> books = bookDao.findAllBooks(10, 10);
+        assertThat(books).hasSize(10);
+    }
+
+    @Test
+    void testFindAllBookPage10() {
+        List<Book> books = bookDao.findAllBooks(10, 100);
+        assertThat(books).isEmpty();
+    }
+
+    @Test
+    void testFindAllBookPage1WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(0, 10));
+        assertThat(books).hasSize(10);
+    }
+
+    @Test
+    void testFindAllBookPage2WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(1, 10));
+        assertThat(books).hasSize(10);
+    }
+
+    @Test
+    void testFindAllBookPage10WithPageable() {
+        List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
+        assertThat(books).isEmpty();
+    }
+
+    @Test
+    void testFindAllBookSorted() {
+        List<Book> books = bookDao.findAllBooksSortByTitle(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("title"))));
+        assertThat(books).isNotNull();
+        assertThat(books).hasSize(10);
     }
 }
