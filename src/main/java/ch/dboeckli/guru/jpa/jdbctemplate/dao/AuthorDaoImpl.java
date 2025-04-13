@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -43,8 +44,8 @@ public class AuthorDaoImpl implements AuthorDao {
         sb.append("SELECT * FROM author WHERE last_name = ? ");
 
         if (pageable.getSort().getOrderFor("firstname") != null) {
-            sb.append("order by first_name ").append(pageable.getSort()
-                .getOrderFor("firstname").getDirection().name());
+            sb.append("order by first_name ").append(Objects.requireNonNull(pageable.getSort()
+                .getOrderFor("firstname")).getDirection().name());
         }
 
         sb.append(" limit ? offset ?");
