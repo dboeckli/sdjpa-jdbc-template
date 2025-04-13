@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -68,8 +69,8 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<Book> findAllBooksSortByTitle(Pageable pageable) {
-        String sql = "SELECT * FROM book order by title " + pageable
-            .getSort().getOrderFor("title")
+        String sql = "SELECT * FROM book order by title " + Objects.requireNonNull(pageable
+            .getSort().getOrderFor("title"))
             .getDirection().name()
             + " limit ? offset ?";
 
