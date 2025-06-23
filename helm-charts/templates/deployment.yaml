@@ -28,10 +28,8 @@ spec:
               value: "{{ .Values.global.timezone }}"
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.spring.profiles.active | default "local" }}
-            - name: SPRING_LIQUIBASE_ENABLED
-              value: "true"
             - name: SPRING_FLYWAY_ENABLED
-              value: "false"
+              value: "true"
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://{{ .Chart.Name }}-mysql:{{ .Values.mysql.port }}/{{ .Values.mysql.database }}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
           envFrom:
