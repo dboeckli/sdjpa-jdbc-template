@@ -41,7 +41,7 @@ kubectl get deployments -o wide
 kubectl get pods -o wide
 ```
 
-## Deployment with Helm
+### Deployment with Helm
 
 Be aware that we are using a different namespace here (not default).
 
