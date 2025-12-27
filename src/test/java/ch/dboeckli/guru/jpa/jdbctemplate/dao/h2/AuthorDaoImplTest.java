@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ class AuthorDaoImplTest {
             DataIntegrityViolationException.class, () -> authorDao.getById(saved.getId())
         );
         log.info("### Exception message: " + ex.getMessage());
-        assertThat(ex.getMessage()).contains("No data is available [2000-232]");
+        assertThat(ex.getMessage()).contains("No data is available [2000-240]");
     }
 
     @Test
