@@ -8,7 +8,7 @@ To enable Flyway in the MySQL profile, override the following properties when st
 - `spring.flyway.enabled = true`
 - `spring.docker.compose.file = compose-mysql.yaml`
 
-This profile starts MySQL on port 3306 using the Docker Compose file `compose-mysql-.yaml`.
+This profile starts MySQL on port 3306 using the Docker Compose file `compose-mysql.yaml`.
 
 ## Docker
 
@@ -58,7 +58,7 @@ cd target/helm/repo
 unpack
 
 ```powershell
-$file = Get-ChildItem -Filter sdjpa-jdbc-template-v*.tgz | Select-Object -First 1
+$file = Get-ChildItem -Filter sdjpa-jdbc-template-chart-*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 
@@ -126,4 +126,85 @@ You can use the actuator rest call to verify via port 30080
 1. Choose between h2 or mysql for database schema management. (you can use one of the preconfigured intellij runners)
 2. Start the application with the appropriate profile and properties.
 3. The application will use Docker Compose to start MySQL and apply the database schema changes.
+
+## Sandbox (local dev environment)
+
+The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
+repo, starts the agent, and connects the IntelliJ MCP server. The app runs on port `8080`; the
+`compose-mysql.yaml` file provides MySQL.
+
+Allow the kit source (GitHub without cloning):
+
+```powershell
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+```
+
+Start a new sandbox:
+
+```powershell
+sbx run opencode `
+    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker/sandbox-templates:opencode-docker-0.5.0 `
+    --skills=off `
+    --static-mcp idea `
+    . `
+    "C:\development\maven-repo:ro"
+```
+
+Start the sandbox with Kubernetes support:
+
+```powershell
+sbx run opencode `
+    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker/sandbox-templates:opencode-docker-0.5.0 `
+    --skills=off `
+    --static-mcp idea `
+    . `
+    "C:\development\maven-repo:ro" `
+    "$env:USERPROFILE\.kube:ro"
+```
+
+Claude Code (Home) and Mammouth Code variants:
+
+```powershell
+sbx run claude `
+    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker/sandbox-templates:claude-code-docker-0.5.0 `
+    --skills=off `
+    --static-mcp idea `
+    . `
+    "C:\development\maven-repo:ro"
+```
+
+```powershell
+sbx run "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=mammouth-agent" `
+    --skills=off `
+    --static-mcp idea `
+    . `
+    "C:\development\maven-repo:ro"
+```
+
+Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
+
+```powershell
+sbx kit add <sandbox-name> "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
+```
+
+### Start the app
+
+Pick a profile (H2 needs no Docker, MySQL uses the compose file):
+
+```shell
+docker compose -f compose-mysql.yaml up
+```
+
+Then run one of the IntelliJ run configurations (`.run/Spring6Application h2.run.xml`,
+`.run/Spring6Application mysql.run.xml`) or start via
+`./mvnw spring-boot:run -Dspring-boot.run.profiles=h2`.
+
+### Sandbox build quirk
+
+The sandbox mounts the repo via filesystem passthrough, which blocks symlinks — Spotless's `npm install`
+(prettier) would fail with `EPERM` unless npm skips bin links. The kit sets `npm_config_bin_links=false`
+globally, so no manual export is needed.
 
