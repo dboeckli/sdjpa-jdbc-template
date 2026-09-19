@@ -22,49 +22,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 class ActuatorInfoTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @Autowired
-    BuildProperties buildProperties;
+	@Autowired
+	BuildProperties buildProperties;
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Test
-    void actuatorInfoTest() throws Exception {
-        mockMvc.perform(get("/actuator/info"))
-            .andExpect(status().isOk())
-            .andDo(result -> log.info("Response (pretty):\n{}", pretty(result.getResponse().getContentAsString())))
+	@Test
+	void actuatorInfoTest() throws Exception {
+		mockMvc.perform(get("/actuator/info"))
+			.andExpect(status().isOk())
+			.andDo(result -> log.info("Response (pretty):\n{}", pretty(result.getResponse().getContentAsString())))
 
-            .andExpect(jsonPath("$.git.commit.id.abbrev").isString())
+			.andExpect(jsonPath("$.git.commit.id.abbrev").isString())
 
-            .andExpect(jsonPath("$.build.artifact").value(buildProperties.getArtifact()))
-            .andExpect(jsonPath("$.build.group").value(buildProperties.getGroup()));
-    }
+			.andExpect(jsonPath("$.build.artifact").value(buildProperties.getArtifact()))
+			.andExpect(jsonPath("$.build.group").value(buildProperties.getGroup()));
+	}
 
-    @Test
-    void actuatorHealthTest() throws Exception {
-        mockMvc.perform(get("/actuator/health/readiness"))
-            .andExpect(status().isOk())
-            .andDo(result -> log.info("Response (pretty):\n{}", pretty(result.getResponse().getContentAsString())))
-            .andExpect(jsonPath("$.status").value("UP"));
-    }
+	@Test
+	void actuatorHealthTest() throws Exception {
+		mockMvc.perform(get("/actuator/health/readiness"))
+			.andExpect(status().isOk())
+			.andDo(result -> log.info("Response (pretty):\n{}", pretty(result.getResponse().getContentAsString())))
+			.andExpect(jsonPath("$.status").value("UP"));
+	}
 
-    @Test
-    void actuatorPrometheusTest() throws Exception {
-        mockMvc.perform(get("/actuator/prometheus"))
-            .andExpect(status().isOk())
-            .andDo(result -> log.info("Response:\n{}", result.getResponse().getContentAsString()));
-    }
+	@Test
+	void actuatorPrometheusTest() throws Exception {
+		mockMvc.perform(get("/actuator/prometheus"))
+			.andExpect(status().isOk())
+			.andDo(result -> log.info("Response:\n{}", result.getResponse().getContentAsString()));
+	}
 
-    private String pretty(String body) {
-        try {
-            Object json = OBJECT_MAPPER.readValue(body, Object.class);
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        } catch (Exception e) {
-            // Falls kein valides JSON: unverändert zurückgeben
-            return body;
-        }
-    }
+	private String pretty(String body) {
+		try {
+			Object json = OBJECT_MAPPER.readValue(body, Object.class);
+			return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+		}
+		catch (Exception e) {
+			// Falls kein valides JSON: unverändert zurückgeben
+			return body;
+		}
+	}
 
 }

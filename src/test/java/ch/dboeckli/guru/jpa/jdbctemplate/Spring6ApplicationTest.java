@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 class Spring6ApplicationTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+	@Autowired
+	private ApplicationContext applicationContext;
 
-    @Test
-    void contextLoads() {
-        log.info("Testing Spring 6 Application {}", applicationContext.getApplicationName());
-        assertNotNull(applicationContext, "Application context should not be null");
-    }
+	@Test
+	void contextLoads() {
+		log.info("Testing Spring 6 Application {}", applicationContext.getApplicationName());
+		assertNotNull(applicationContext, "Application context should not be null");
+	}
 
 }

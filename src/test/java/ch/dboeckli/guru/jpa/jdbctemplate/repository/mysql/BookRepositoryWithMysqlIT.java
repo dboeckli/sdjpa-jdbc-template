@@ -14,21 +14,25 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test_mysql")
 @DirtiesContext
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // to assure that it is not replaced with h2
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // to assure
+																				// that it
+																				// is not
+																				// replaced
+																				// with h2
 class BookRepositoryWithMysqlIT {
 
-    @Autowired
-    BookRepository bookRepository;
+	@Autowired
+	BookRepository bookRepository;
 
-    @Test
-    void testJpaTestSplice() {
-        long countBefore = bookRepository.count();
+	@Test
+	void testJpaTestSplice() {
+		long countBefore = bookRepository.count();
 
-        bookRepository.save(new Book("My Book", "1235555", "Self"));
+		bookRepository.save(new Book("My Book", "1235555", "Self"));
 
-        long countAfter = bookRepository.count();
+		long countAfter = bookRepository.count();
 
-        assertThat(countAfter).isEqualTo(countBefore + 1);
-    }
+		assertThat(countAfter).isEqualTo(countBefore + 1);
+	}
 
 }

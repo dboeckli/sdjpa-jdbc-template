@@ -22,112 +22,113 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DataJpaTest
 class BookDaoImplTest {
 
-    @Autowired
-    BookDao bookDao;
+	@Autowired
+	BookDao bookDao;
 
-    @Test
-    void testDeleteBook() {
-        Book book = new Book();
-        book.setIsbn("1234");
-        book.setPublisher("Self");
-        book.setTitle("my book");
-        Book saved = bookDao.saveNewBook(book);
+	@Test
+	void testDeleteBook() {
+		Book book = new Book();
+		book.setIsbn("1234");
+		book.setPublisher("Self");
+		book.setTitle("my book");
+		Book saved = bookDao.saveNewBook(book);
 
-        bookDao.deleteBookById(saved.getId());
+		bookDao.deleteBookById(saved.getId());
 
-        assertThrows(EmptyResultDataAccessException.class, () -> bookDao.getById(saved.getId()));
-    }
+		assertThrows(EmptyResultDataAccessException.class, () -> bookDao.getById(saved.getId()));
+	}
 
-    @Test
-    void updateBookTest() {
-        Book book = new Book();
-        book.setIsbn("1234");
-        book.setPublisher("Self");
-        book.setTitle("my book");
-        book.setAuthorId(1L);
-        Book saved = bookDao.saveNewBook(book);
+	@Test
+	void updateBookTest() {
+		Book book = new Book();
+		book.setIsbn("1234");
+		book.setPublisher("Self");
+		book.setTitle("my book");
+		book.setAuthorId(1L);
+		Book saved = bookDao.saveNewBook(book);
 
-        saved.setTitle("New Book");
-        bookDao.updateBook(saved);
+		saved.setTitle("New Book");
+		bookDao.updateBook(saved);
 
-        Book fetched = bookDao.getById(saved.getId());
+		Book fetched = bookDao.getById(saved.getId());
 
-        assertThat(fetched.getTitle()).isEqualTo("New Book");
-    }
+		assertThat(fetched.getTitle()).isEqualTo("New Book");
+	}
 
-    @Test
-    void testSaveBook() {
-        Book book = new Book();
-        book.setIsbn("1234");
-        book.setPublisher("Self");
-        book.setTitle("my book");
-        book.setAuthorId(1L);
+	@Test
+	void testSaveBook() {
+		Book book = new Book();
+		book.setIsbn("1234");
+		book.setPublisher("Self");
+		book.setTitle("my book");
+		book.setAuthorId(1L);
 
-        Book saved = bookDao.saveNewBook(book);
+		Book saved = bookDao.saveNewBook(book);
 
-        assertThat(saved).isNotNull();
-    }
+		assertThat(saved).isNotNull();
+	}
 
-    @Test
-    void testGetBookByName() {
-        Book book = bookDao.findBookByTitle("Clean Code");
+	@Test
+	void testGetBookByName() {
+		Book book = bookDao.findBookByTitle("Clean Code");
 
-        assertThat(book).isNotNull();
-    }
+		assertThat(book).isNotNull();
+	}
 
-    @Test
-    void testGetBook() {
-        Book book = bookDao.getById(3L);
+	@Test
+	void testGetBook() {
+		Book book = bookDao.getById(3L);
 
-        assertThat(book.getId()).isNotNull();
-    }
+		assertThat(book.getId()).isNotNull();
+	}
 
-    @Test
-    void testFindAllBook() {
-        List<Book> books = bookDao.findAllBooks();
-        assertThat(books.size()).isGreaterThan(0);
-    }
+	@Test
+	void testFindAllBook() {
+		List<Book> books = bookDao.findAllBooks();
+		assertThat(books.size()).isGreaterThan(0);
+	}
 
-    @Test
-    void testFindAllBookPage1() {
-        List<Book> books = bookDao.findAllBooks(10, 0);
-        assertThat(books).hasSize(10);
-    }
+	@Test
+	void testFindAllBookPage1() {
+		List<Book> books = bookDao.findAllBooks(10, 0);
+		assertThat(books).hasSize(10);
+	}
 
-    @Test
-    void testFindAllBookPage2() {
-        List<Book> books = bookDao.findAllBooks(10, 10);
-        assertThat(books).hasSize(10);
-    }
+	@Test
+	void testFindAllBookPage2() {
+		List<Book> books = bookDao.findAllBooks(10, 10);
+		assertThat(books).hasSize(10);
+	}
 
-    @Test
-    void testFindAllBookPage10() {
-        List<Book> books = bookDao.findAllBooks(10, 100);
-        assertThat(books).isEmpty();
-    }
+	@Test
+	void testFindAllBookPage10() {
+		List<Book> books = bookDao.findAllBooks(10, 100);
+		assertThat(books).isEmpty();
+	}
 
-    @Test
-    void testFindAllBookPage1WithPageable() {
-        List<Book> books = bookDao.findAllBooks(PageRequest.of(0, 10));
-        assertThat(books).hasSize(10);
-    }
+	@Test
+	void testFindAllBookPage1WithPageable() {
+		List<Book> books = bookDao.findAllBooks(PageRequest.of(0, 10));
+		assertThat(books).hasSize(10);
+	}
 
-    @Test
-    void testFindAllBookPage2WithPageable() {
-        List<Book> books = bookDao.findAllBooks(PageRequest.of(1, 10));
-        assertThat(books).hasSize(10);
-    }
+	@Test
+	void testFindAllBookPage2WithPageable() {
+		List<Book> books = bookDao.findAllBooks(PageRequest.of(1, 10));
+		assertThat(books).hasSize(10);
+	}
 
-    @Test
-    void testFindAllBookPage10WithPageable() {
-        List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
-        assertThat(books).isEmpty();
-    }
+	@Test
+	void testFindAllBookPage10WithPageable() {
+		List<Book> books = bookDao.findAllBooks(PageRequest.of(10, 10));
+		assertThat(books).isEmpty();
+	}
 
-    @Test
-    void testFindAllBookSorted() {
-        List<Book> books = bookDao.findAllBooksSortByTitle(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("title"))));
-        assertThat(books).isNotNull();
-        assertThat(books).hasSize(10);
-    }
+	@Test
+	void testFindAllBookSorted() {
+		List<Book> books = bookDao.findAllBooksSortByTitle(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("title"))));
+		assertThat(books).isNotNull();
+		assertThat(books).hasSize(10);
+	}
+
 }

@@ -11,25 +11,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
-// we are using the h2 in compatible mode with mysql. to assure that it is not replaced with h2
+// we are using the h2 in compatible mode with mysql. to assure that it is not replaced
+// with h2
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BookRepositoryWithH2Test {
 
-    @Autowired
-    BookRepository bookRepository;
+	@Autowired
+	BookRepository bookRepository;
 
-    @Test
-    void testJpaTestSplice() {
-        long countBefore = bookRepository.count();
+	@Test
+	void testJpaTestSplice() {
+		long countBefore = bookRepository.count();
 
-        bookRepository.save(new Book("My Book", "1235555", "Self"));
+		bookRepository.save(new Book("My Book", "1235555", "Self"));
 
-        long countAfter = bookRepository.count();
+		long countAfter = bookRepository.count();
 
-        assertAll(
-            () -> assertThat(countBefore).isEqualTo(25),
-            () -> assertThat(countAfter).isEqualTo(26)
-        );
-    }
+		assertAll(() -> assertThat(countBefore).isEqualTo(25), () -> assertThat(countAfter).isEqualTo(26));
+	}
 
 }
