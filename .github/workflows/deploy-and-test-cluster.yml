@@ -2,9 +2,6 @@ name: Deploy and Test Cluster
 run-name: >
   ${{ github.workflow }}: ${{ github.event_name }} for ${{ github.ref_name }} by @${{ github.actor }}
 
-env:
-  JAVA_VERSION: 25
-
 on:
   workflow_dispatch:
     inputs:
@@ -36,94 +33,8 @@ on:
         default: 'None'
 
 jobs:
-  deploy-app-with-kubectl:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Show Version
-        run: |
-          echo "Deploying Application ${{ inputs.application-name }}, Version: ${{ inputs.version }}"
-          echo "Deployment triggered by workflow ${{ inputs.deployed-by-workflow }}. Run number: ${{ inputs.deployed-by-build }}"
-
-      - name: Check out the repository
-        uses: actions/checkout@v7
-
-      - name: Set up java
-        uses: actions/setup-java@v6
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'liberica'
-          cache: 'maven'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml.
-          settings-path: ${{ github.workspace }} # location for t
-
-      - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.15.0
-
-      - name: Deploy application
-        env:
-          APPLICATION_NAME: ${{ inputs.application-name }}
-          VERSION: ${{ inputs.version }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          mvn -B versions:set -e -DnewVersion="$VERSION"
-          mvn -B process-resources -s $GITHUB_WORKSPACE/settings.xml
-          cat target/k8s/app.yml
-          echo "Deploying Application $APPLICATION_NAME with version $VERSION"
-          kubectl apply -f target/k8s/ --v=6 -R
-
-      - name: Wait for Pods to be ready
-        env:
-          APPLICATION_NAME: ${{ inputs.application-name }}
-        run: |
-          if ! kubectl wait --for=condition=ready pod -l app=$APPLICATION_NAME --timeout=180s; then
-            echo "Pod did not become ready within 180 seconds. Displaying logs:"
-            kubectl get pods -l app=$APPLICATION_NAME
-            POD_NAME=$(kubectl get pods -l app=$APPLICATION_NAME -o jsonpath="{.items[0].metadata.name}")
-            kubectl logs $POD_NAME
-            echo "Describing the pod:"
-            kubectl describe pod $POD_NAME
-            exit 1
-          fi
-          BUILD_LINK="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ inputs.deployed-by-build }}"
-          echo "::notice:: ### Deployed Version: ${{ inputs.version }}"
-          echo "::notice:: ### Deployment triggered by workflow ${{ inputs.deployed-by-workflow }}. Run number: ${{ inputs.deployed-by-build }}: $BUILD_LINK"
-
-      - name: Display Deployment Information
-        env:
-          APPLICATION_NAME: ${{ inputs.application-name }}
-        if: always()
-        run: |
-          echo "Deployment Information:"
-          
-          echo "--- Pods:"
-          kubectl get pods -n default
-          
-          echo "--- Describe pods:"
-          kubectl describe pods -n default
-          
-          echo "--- Services:"
-          kubectl get services -n default
-          
-          echo "--- Show Events:"
-          kubectl get events --sort-by=.metadata.creationTimestamp -n default
-          
-          echo "--- Show Logs (if pods exist)"
-          PODS=$(kubectl get pods -l app=$APPLICATION_NAME -o jsonpath="{.items[*].metadata.name}" -n default)
-          if [ -n "$PODS" ]; then
-            for POD in $PODS; do
-              echo "Logs for pod $POD:"
-              kubectl logs $POD -n default --all-containers
-            done
-          else
-            echo "No pods found with label app=$APPLICATION_NAME in default namespace"
-            echo "Listing all pods in default namespace:"
-            kubectl get pods -n default
-          fi      
-
   deploy-app-with-helm:
     runs-on: ubuntu-latest
-    needs: deploy-app-with-kubectl
 
     steps:
       - name: Show Version
@@ -143,27 +54,23 @@ jobs:
           DOCKER_USER: ${{ vars.DOCKER_USER }}
           APPLICATION_NAME: ${{ inputs.application-name }}
         run: |
-          echo "Pulling Helm Chart Version: $HELM_CHART_VERSION from oci://registry-1.docker.io/$DOCKER_USER/$APPLICATION_NAME"
-          helm pull oci://registry-1.docker.io/$DOCKER_USER/$APPLICATION_NAME --version "$HELM_CHART_VERSION"
-          tar -xvf $APPLICATION_NAME-v*.tgz  
+          echo "Pulling Helm Chart Version: $HELM_CHART_VERSION from oci://registry-1.docker.io/$DOCKER_USER/$APPLICATION_NAME-chart"
+          helm pull oci://registry-1.docker.io/$DOCKER_USER/$APPLICATION_NAME-chart --version "$HELM_CHART_VERSION"
+          tar -xvf $APPLICATION_NAME-*.tgz  
 
       - name: Deploy application with Helm
         env:
-          APP_VERSION: ${{ inputs.version }}
+          APP_VERSION: ${{ inputs.helm-chart-version }}
           APPLICATION_NAME: ${{ inputs.application-name }}
           NAMESPACE: ${{ inputs.namespace }}
         run: |
           # Install/upgrade the Helm chart
           echo "Deploying Application $APPLICATION_NAME: $APP_VERSION"
-          helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME \
-          --set image.tag=${APP_VERSION} \
+          helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME-chart \
           --namespace ${NAMESPACE} \
           --create-namespace \
-          --cleanup-on-fail \
-          --atomic \
           --wait --timeout 5m \
-          --debug \
-          --render-subchart-notes
+          --debug
 
       - name: Wait for Pods to be ready
         env:
@@ -183,34 +90,32 @@ jobs:
 
       - name: Test Application
         env:
-          APP_VERSION: ${{ inputs.version }}
+          APP_VERSION: ${{ inputs.helm-chart-version }}
           APPLICATION_NAME: ${{ inputs.application-name }}
           NAMESPACE: ${{ inputs.namespace }}
         run: |
-          echo "::group::Application Deployment Status"
-          echo "Checking status of $APPLICATION_NAME (version $APP_VERSION) in namespace $NAMESPACE"
-          echo "Helm Release Details:"
-          helm status $APPLICATION_NAME --namespace ${NAMESPACE}
-          echo "::endgroup::"
-          
-          echo "::group::Helm Test Raw Output"
           echo "Testing Application $APPLICATION_NAME: $APP_VERSION"
+          # Do not let the runner's `set -e` abort before the test output is printed.
+          set +e
           TEST_OUTPUT=$(helm test $APPLICATION_NAME --namespace ${NAMESPACE} --logs)
           TEST_EXIT_CODE=$?
+          set -e
+          
+          echo "::group::Helm Test Raw Output"
           echo "Exit Code: $TEST_EXIT_CODE"
           echo "$TEST_OUTPUT"
           echo "::endgroup::"
           
           # Check all test exit codes
           if echo "$TEST_OUTPUT" | grep -q "Exit code: [^0]"; then
-            echo "::error::One or more Helm tests failed. See details above:"
+            echo "::error::One or more Helm tests failed. See details below:"
             exit 1
           elif [ $TEST_EXIT_CODE -ne 0 ]; then
             echo "::error::Helm test command failed with exit code $TEST_EXIT_CODE"
             exit $TEST_EXIT_CODE
           else
             echo "All Helm tests passed successfully."
-          fi                 
+          fi          
 
       - name: Display Deployment Information
         env:
