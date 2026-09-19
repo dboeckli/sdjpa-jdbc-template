@@ -1,3 +1,6 @@
+nameOverride: "sdjpa-jdbc-template"
+fullnameOverride: "sdjpa-jdbc-template"
+
 global:
   timezone: Europe/Zurich
   timezonePath: /etc/localtime
@@ -45,9 +48,14 @@ probes:
 
 mysql:
   enabled: true
+  fullnameOverride: "sdjpa-jdbc-template-mysql"
+  serviceFQDN: "sdjpa-jdbc-template-mysql.sdjpa-jdbc-template.svc.cluster.local"
 
   database: bookdb
+
   port: 3306
+  targetPort: 3306
+  nodePort: 30306
 
   adminUser: bookadmin
   adminPassword: password
@@ -56,8 +64,6 @@ mysql:
   password: password
 
   rootPassword: password
-
-  serviceFQDN: "sdjpa-jdbc-template-sdjpa-jdbc-template-mysql.sdjpa-jdbc-template.svc.cluster.local"
 
 ingress:
   enabled: false

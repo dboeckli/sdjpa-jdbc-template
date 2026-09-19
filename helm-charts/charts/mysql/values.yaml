@@ -1,5 +1,5 @@
 global:
-  namespace: sdjpa-jdbc-template-mysql
+  namespace: sdjpa-jdbc-template
 
 mysql:
   port: 3306
