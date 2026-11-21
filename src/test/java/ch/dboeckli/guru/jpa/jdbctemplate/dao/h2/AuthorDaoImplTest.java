@@ -41,7 +41,7 @@ class AuthorDaoImplTest {
 		DataIntegrityViolationException ex = assertThrows(DataIntegrityViolationException.class,
 				() -> authorDao.getById(saved.getId()));
 		log.info("### Exception message: " + ex.getMessage());
-		assertThat(ex.getMessage()).contains("No data is available [2000-240]");
+		assertThat(ex.getMessage()).contains("No data is available [2000-252]");
 	}
 
 	@Test
