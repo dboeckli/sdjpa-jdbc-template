@@ -204,53 +204,11 @@ sbx settings set kit.allowedSources --% "[\"docker.io/\",\"codeberg.org/dboeckli
 Start a new sandbox:
 
 ```powershell
-sbx run opencode `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
+sbx run docker.io/domboeckli/sbx-opencode:latest `
     --skills=off `
-    --static-mcp idea `
+    --static-mcp idea,k8s,docker `
     . `
     "C:\development\maven-repo:ro"
-```
-
-Start the sandbox with Kubernetes support:
-
-```powershell
-sbx run opencode `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
-    --skills=off `
-    --static-mcp idea `
-    . `
-    "$env:USERPROFILE\.kube:ro" `
-    "C:\development\maven-repo:ro"
-```
-
-Claude Code (Home) and Mammouth Code variants:
-
-```powershell
-sbx run claude `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-claude-tooling:latest `
-    --skills=off `
-    --static-mcp idea `
-    . `
-    "C:\development\maven-repo:ro"
-```
-
-```powershell
-sbx run "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=mammouth-agent" `
-    --kit-arg imageTag=latest `
-    --skills=off `
-    --static-mcp idea `
-    . `
-    "C:\development\maven-repo:ro"
-```
-
-Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
-
-```powershell
-sbx kit add opencode-sdjpa-jdbc-template "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
 ```
 
 ### Start the app
